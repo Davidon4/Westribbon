@@ -9,12 +9,6 @@ export interface AppButtonProps extends TouchableOpacityProps {
 
 export interface AppCardProps extends TouchableOpacityProps {
     title?: string,
-    icon?: React.ReactNode,
-}
-
-export interface InfoCardProps extends TouchableOpacityProps {
-    title?: string,
-    icon?: React.ReactNode
 }
 
 export interface AppInputProps {
