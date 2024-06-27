@@ -38,7 +38,6 @@ const Dashboard = () => {
         console.error('Error fetching trainings:', response.error);
       } else {
         setTrainings(response.data.allTrainings);
-        console.table('Fetched trainings:', trainings);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
