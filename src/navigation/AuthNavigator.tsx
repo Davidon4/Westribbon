@@ -14,13 +14,7 @@ const forFade = ({ current }: StackCardInterpolationProps): StackCardInterpolate
 
 export default function AuthNavigator(): JSX.Element {
   return (
-      <Stack.Navigator
-      initialRouteName="Signup"
-        screenOptions={{
-          headerShown: false,
-          ...TransitionPresets.SlideFromRightIOS,
-        }}
-      >
+      <Stack.Navigator>
           <Stack.Screen name="Signin"
            component={Signin}
            options={{

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, ImageBackground} from "react-native";
+import { Text, View, Alert, ImageBackground} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import {styles} from './styles';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,6 +9,7 @@ import { COLORS } from '../../../theme';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RootStackParamList } from '../../../navigation/types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { graphqlNoAuthRequest } from '@/src/utils/client';
 
 type SignUpNavigationProp = StackNavigationProp<RootStackParamList, "Signin">;
 
@@ -25,9 +26,35 @@ const SignUp: React.FC<Props> = ({navigation}) => {
     resolver: yupResolver(signupSchema),
   })
 
-  const onSubmit = (data: any) => {
-    navigation.navigate("Signin", data);
-  }
+  const onSubmit = async (data: any) => {
+    const queryString = `mutation CreateUser( $firstname: String!, $lastname: String!, $email: String!, $phone: String!, $password: String! ){
+      createUser( firstname: $firstname, lastname: $lastname){
+          id
+          firstname
+          lastname
+          email
+          phone
+      }
+    }`;
+
+    const variable = {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      phone: data.phone,
+      password: data.password
+    };
+
+    const response = await graphqlNoAuthRequest(queryString, variable);
+
+    if (response.error) {
+    Alert.alert('Login Failed', response.error);
+      console.log(JSON.parse(response.error));
+    } else {
+      Alert.alert('Signup Successful', 'User created successfully!');
+        navigation.navigate('Signin');
+    }
+  };
 
     return (
       <>

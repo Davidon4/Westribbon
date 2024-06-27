@@ -23,7 +23,7 @@ export function AppInput (props: AppInputProps): JSX.Element {
         placeholderTextColor={COLORS.darkGrey}
         secureTextEntry={isPassword && !isPasswordVisible}
         style={[styles.input]}
-        {...props}
+        {...rest}
       />
       {isPassword ? (
         <Pressable onPress={onEyePress}>
