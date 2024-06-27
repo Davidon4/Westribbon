@@ -18,12 +18,14 @@ export default function AuthNavigator(): JSX.Element {
           <Stack.Screen name="Signin"
            component={Signin}
            options={{
+            headerShown: false,
             cardStyleInterpolator: forFade,
           }}
            />
           <Stack.Screen name="Signup"
            component={Signup}
             options={{
+            headerShown: false,
               cardStyleInterpolator: forFade,
             }}
           />

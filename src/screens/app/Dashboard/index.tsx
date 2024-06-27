@@ -65,6 +65,8 @@ const Dashboard = () => {
   );
 };
 
+export default React.memo(Dashboard);
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -90,4 +92,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+

@@ -28,7 +28,7 @@ const SignUp: React.FC<Props> = ({navigation}) => {
 
   const onSubmit = async (data: any) => {
     const queryString = `mutation CreateUser( $firstname: String!, $lastname: String!, $email: String!, $phone: String!, $password: String! ){
-      createUser( firstname: $firstname, lastname: $lastname){
+      createUser( firstname: $firstname, lastname: $lastname, email: $email, phone: $phone, password: $password){
           id
           firstname
           lastname
@@ -46,9 +46,10 @@ const SignUp: React.FC<Props> = ({navigation}) => {
     };
 
     const response = await graphqlNoAuthRequest(queryString, variable);
+    console.log("RESPONSE=>", response)
 
     if (response.error) {
-    Alert.alert('Login Failed', response.error);
+    Alert.alert('Signup Failed', response.error);
       console.log(JSON.parse(response.error));
     } else {
       Alert.alert('Signup Successful', 'User created successfully!');
@@ -128,13 +129,14 @@ const SignUp: React.FC<Props> = ({navigation}) => {
           <AppInput
           onChangeText={onChange}
           onBlur={onBlur}
+          keyboardType='phone-pad'
           value={value}
             label="Phone Number"
           />
         )}
-        name="phonenumber"
+        name="phone"
       />
-        <Text style={styles.errorMessage}>{errors.phonenumber?.message}</Text>
+        <Text style={styles.errorMessage}>{errors.phone?.message}</Text>
         <Controller
         control={control}
         rules={{
