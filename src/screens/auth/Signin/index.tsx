@@ -23,6 +23,7 @@ const Signin: React.FC<Props> = ({ navigation }) => {
     control,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm({
     resolver: yupResolver(signinSchema),
   });
@@ -56,6 +57,7 @@ const Signin: React.FC<Props> = ({ navigation }) => {
         await AsyncStorage.setItem('token', token);
         await AsyncStorage.setItem('user', JSON.stringify(user));
         navigation.navigate('Dashboard');
+        reset();
     }
   };
 

@@ -1,39 +1,82 @@
-import { NavigationContainer } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import AppNavigator from "./AppNavigator";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AuthNavigator from "./AuthNavigator";
+import { RootStackParamList } from './types';
+import {createStackNavigator, StackCardInterpolatedStyle, StackCardInterpolationProps } from "@react-navigation/stack";
+import Signin from '../screens/auth/Signin';
+import Signup from '../screens/auth/Signup';
+import { useNavigation } from '@react-navigation/native';
+import Dashboard from '../screens/app/Dashboard';
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+const forFade = ({ current }: StackCardInterpolationProps): StackCardInterpolatedStyle => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
 
 function Navigation() {
-  const [user, setUser] = useState<string | null>(null);
+  const [stateToken, setStateToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<{ firstname: string; lastname: string; } | null>(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    const checkUserToken = async () => {
+    const initializeUser = async () => {
       try {
-        const userToken = await AsyncStorage.getItem('token');
+        const [userToken, userString] = await Promise.all([
+          AsyncStorage.getItem('token'),
+          AsyncStorage.getItem('user')
+        ]);
+
         if (userToken) {
-          setUser(userToken);
+          setStateToken(userToken);
+        }
+
+        if (userString) {
+          const userData = JSON.parse(userString);
+          setUser(userData);
         }
       } catch (e) {
-        console.error('Failed to load user token', e);
+        console.error('Failed to load user data', e);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkUserToken();
+    initializeUser();
   }, []);
 
-  if (isLoading) {
-    // You can render a loading spinner here if you want
-    return null;
-  }
-
   return (
-    <NavigationContainer>
-      {user ? <AppNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+      <Stack.Navigator>
+        {user && (
+                 <Stack.Screen
+                 name="Dashboard"
+                 component={Dashboard}
+                 options={{
+                   title: user ? `Welcome back ${user.firstname} ${user.lastname}` : 'Dashboard',
+                   headerShown: true,
+                   headerBackTitleVisible: false,
+                   headerTitleAlign: 'center',
+                   headerLeft: () => null,
+                 }}
+               />
+        )}
+              <Stack.Screen name="Signin"
+           component={Signin}
+           options={{
+            headerShown: false,
+            cardStyleInterpolator: forFade,
+          }}
+           />
+          <Stack.Screen name="Signup"
+           component={Signup}
+            options={{
+            headerShown: false,
+              cardStyleInterpolator: forFade,
+            }}
+          />
+      </Stack.Navigator>
   );
 }
 
