@@ -4,7 +4,6 @@ import { RootStackParamList } from './types';
 import {createStackNavigator, StackCardInterpolatedStyle, StackCardInterpolationProps } from "@react-navigation/stack";
 import Signin from '../screens/auth/Signin';
 import Signup from '../screens/auth/Signup';
-import { useNavigation } from '@react-navigation/native';
 import Dashboard from '../screens/app/Dashboard';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -19,7 +18,6 @@ function Navigation() {
   const [stateToken, setStateToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<{ firstname: string; lastname: string; } | null>(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
     const initializeUser = async () => {
