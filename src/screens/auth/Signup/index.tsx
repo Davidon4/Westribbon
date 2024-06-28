@@ -65,11 +65,15 @@ const SignUp: React.FC<Props> = ({navigation}) => {
     } else {
       setEmailError("")
     }
-    if (!password){
-      setPasswordError("Password is required")
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!password) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else if (!passwordRegex.test(password)) {
+      setPasswordError('Password must contain at least 8 characters, one uppercase letter, one number, and one special character');
       valid = false;
     } else {
-      setPasswordError("")
+      setPasswordError('');
     }
     return valid;
   }
