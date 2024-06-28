@@ -5,7 +5,7 @@ import { AppInputProps } from '../types';
 import { COLORS } from '../theme';
 
 export function AppInput (props: AppInputProps): JSX.Element {
-  const { label, isPassword, onBlur, value, keyboardType, onChangeText, ...rest } = props;
+  const { label, isPassword, value, keyboardType, onChangeText, ...rest } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const onEyePress = () => {
@@ -17,7 +17,7 @@ export function AppInput (props: AppInputProps): JSX.Element {
       <Text style={styles.label}>{label}<Text style={{color: COLORS.red}}>*</Text></Text>
       <TextInput
         onChangeText={onChangeText}
-        onBlur={onBlur}
+        // onBlur={onBlur}
         value={value}
         keyboardType={keyboardType}
         placeholderTextColor={COLORS.darkGrey}

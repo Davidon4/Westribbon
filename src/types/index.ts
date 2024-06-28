@@ -17,5 +17,4 @@ export interface AppInputProps {
     value?: string;
     keyboardType?: KeyboardTypeOptions;
     onChangeText: (text: string) => void;
-    onBlur: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   }

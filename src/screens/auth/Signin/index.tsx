@@ -1,9 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, View, ImageBackground, Alert } from "react-native";
-import { useForm, Controller } from "react-hook-form";
 import { styles } from './styles';
-import { yupResolver } from "@hookform/resolvers/yup";
-import { signinSchema } from '@/src/schema';
 import { AppInput, AppButton } from '@/src/components';
 import { COLORS } from '../../../theme';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -19,16 +16,41 @@ type Props = {
 };
 
 const Signin: React.FC<Props> = ({ navigation }) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm({
-    resolver: yupResolver(signinSchema),
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
-  const onSubmit = async (data: any) => {
+  function reset() {
+    setEmail('')
+    setPassword('')
+    setPasswordError('')
+    setEmailError('')
+  }
+
+  const validateInput = () => {
+    let valid = true;
+    if(!email){
+      setEmailError("Email is required")
+      valid = false;
+    } else {
+      setEmailError("")
+    }
+    if (!password){
+      setPasswordError("Password is required")
+      valid = false;
+    } else {
+      setPasswordError("")
+    }
+    return valid;
+  }
+
+
+  const onSubmit = async () => {
+    if (!validateInput()) {
+      return;
+    }
+
     const queryString = `mutation LoginUser( $email: String!, $password: String! ){
       loginUser( email: $email, password:$password){
         token
@@ -43,8 +65,8 @@ const Signin: React.FC<Props> = ({ navigation }) => {
     }`;
 
     const variable = {
-      email: data.email,
-      password: data.password
+      email: email,
+      password: password
     };
 
     const response = await graphqlNoAuthRequest(queryString, variable);
@@ -75,41 +97,21 @@ const Signin: React.FC<Props> = ({ navigation }) => {
             Kindly fill the signin form!
           </Text>
           <View style={{ marginVertical: 15 }}>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
                 <AppInput
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
+                  onChangeText={(val) => setEmail(val)}
+                  value={email}
                   label="Email"
                 />
-              )}
-              name="email"
-            />
-            <Text style={styles.errorMessage}>{errors.email?.message}</Text>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
+                {emailError ? <Text style={styles.errorMessage}>{emailError}</Text> : null}
                 <AppInput
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
+                  onChangeText={(val) => setPassword(val)}
+                  value={password}
                   isPassword
                   label="Password"
                 />
-              )}
-              name="password"
-            />
-            <Text style={styles.errorMessage}>{errors.password?.message}</Text>
+                 {passwordError ? <Text style={styles.errorMessage}>{passwordError}</Text> : null}
           </View>
-          <AppButton containerStyle={{ alignItems: 'center', justifyContent: 'center', marginVertical: 15 }} title="Signin" onPress={handleSubmit(onSubmit)} />
+          <AppButton containerStyle={{ alignItems: 'center', justifyContent: 'center', marginVertical: 15 }} title="Signin" onPress={onSubmit} />
           <Text style={styles.bottomText}>Don't have an account? <Text style={styles.agreeTextBold} onPress={() => navigation.navigate('Signup')}>Sign up</Text></Text>
         </KeyboardAwareScrollView>
       </ImageBackground>

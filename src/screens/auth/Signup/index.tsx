@@ -1,9 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, View, Alert, ImageBackground} from "react-native";
-import { useForm, Controller } from "react-hook-form";
 import {styles} from './styles';
-import { yupResolver } from "@hookform/resolvers/yup";
-import { signupSchema } from '../../../schema';
 import { AppInput, AppButton } from '../../../components';
 import { COLORS } from '../../../theme';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -18,15 +15,70 @@ type Props = {
 } 
 
 const SignUp: React.FC<Props> = ({navigation}) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(signupSchema),
-  })
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstnameError, setFirstnameError] = useState(''); 
+  const [lastnameError, setLastnameError] = useState(''); 
+  const [emailError, setEmailError] = useState(''); 
+  const [phoneError, setPhoneError] = useState(''); 
+  const [passwordError, setPasswordError] = useState('');
 
-  const onSubmit = async (data: any) => {
+  function reset() {
+    setEmail('')
+    setPassword('')
+    setLastname('')
+    setFirstname('')
+    setPhone('')
+    setFirstnameError('')
+    setLastnameError('')
+    setPhoneError('')
+    setPasswordError('')
+    setEmailError('')
+  }
+
+  const validateInput = () => {
+    let valid = true;
+    if(!firstname) {
+      setFirstnameError("First Name is required")
+      valid = false;
+    } else {
+      setFirstnameError("")
+    }
+    if(!lastname) {
+      setLastnameError("Last Name is required")
+      valid = false;
+    } else {
+      setLastnameError("")
+    }
+    if(!phone) {
+      setPhoneError("Phone is required")
+      valid = false;
+    } else {
+      setPhoneError("")
+    }
+    if(!email){
+      setEmailError("Email is required")
+      valid = false;
+    } else {
+      setEmailError("")
+    }
+    if (!password){
+      setPasswordError("Password is required")
+      valid = false;
+    } else {
+      setPasswordError("")
+    }
+    return valid;
+  }
+
+  const onSubmit = async () => {
+    if (!validateInput()){
+      return;
+    }
+
     const queryString = `mutation CreateUser( $firstname: String!, $lastname: String!, $email: String!, $phone: String!, $password: String! ){
       createUser( firstname: $firstname, lastname: $lastname, email: $email, phone: $phone, password: $password){
           id
@@ -38,15 +90,14 @@ const SignUp: React.FC<Props> = ({navigation}) => {
     }`;
 
     const variable = {
-      firstname: data.firstname,
-      lastname: data.lastname,
-      email: data.email,
-      phone: data.phone,
-      password: data.password
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      phone: phone,
+      password: password
     };
 
     const response = await graphqlNoAuthRequest(queryString, variable);
-    console.log("RESPONSE=>", response)
 
     if (response.error) {
     Alert.alert('Signup Failed', response.error);
@@ -54,6 +105,7 @@ const SignUp: React.FC<Props> = ({navigation}) => {
     } else {
       Alert.alert('Signup Successful', 'User created successfully!');
         navigation.navigate('Signin');
+        reset();
     }
   };
 
@@ -71,91 +123,40 @@ const SignUp: React.FC<Props> = ({navigation}) => {
             Fill the form to sign up!
         </Text>
         <View style={{marginVertical: 15}}>
-        <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: {onChange, onBlur, value} }) => (
           <AppInput
-          onChangeText={onChange}
-          onBlur={onBlur}
-          value={value}
-            label="First Name"
+          onChangeText={(val) => setFirstname(val)}
+          value={firstname}
+          label="First Name"
           />
-        )}
-        name="firstname"
-      />
-      <Text style={styles.errorMessage}>{errors.firstname?.message}</Text>
-
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: {onChange, onBlur, value} }) => (
+      {firstnameError ? <Text style={styles.errorMessage}>{firstnameError}</Text> : null}
           <AppInput
-          onChangeText={onChange}
-          onBlur={onBlur}
-          value={value}
-            label="Last Name"
+          onChangeText={(val) => setLastname(val)}
+          value={lastname}
+          label="Last Name"
           />
-        )}
-        name="lastname"
-      />
-        <Text style={styles.errorMessage}>{errors.lastname?.message}</Text>
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: {onChange, onBlur, value} }) => (
+        {lastnameError ? <Text style={styles.errorMessage}>{lastnameError}</Text> : null}
           <AppInput
-          onChangeText={onChange}
-          onBlur={onBlur}
-          value={value}
+          onChangeText={(val) => setEmail(val)}
+          value={email}
             label="Email"
           />
-        )}
-        name="email"
-      />
-        <Text style={styles.errorMessage}>{errors.email?.message}</Text>
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: {onChange, onBlur, value} }) => (
+        {emailError ? <Text style={styles.errorMessage}>{emailError}</Text> : null }
           <AppInput
-          onChangeText={onChange}
-          onBlur={onBlur}
+          onChangeText={(val) => setPhone(val)}
           keyboardType='phone-pad'
-          value={value}
+          value={phone}
             label="Phone Number"
           />
-        )}
-        name="phone"
-      />
-        <Text style={styles.errorMessage}>{errors.phone?.message}</Text>
-        <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: {onChange, onBlur, value} }) => (
+      {phoneError ? <Text style={styles.errorMessage}>{phoneError}</Text> : null}
           <AppInput
-          onChangeText={onChange}
-          onBlur={onBlur}
-          value={value}
+          onChangeText={(val) => setPassword(val)}
+          value={password}
           isPassword
-            label="Password"
+          label="Password"
           />
-        )}
-        name="password"
-      />
-        <Text style={styles.errorMessage}>{errors.password?.message}</Text>
+        {passwordError ? <Text style={styles.errorMessage}>{passwordError}</Text> : null}
         </View>
-      <AppButton containerStyle={{alignItems:'center', justifyContent: 'center', marginVertical: 15}} title="Signup" onPress={handleSubmit(onSubmit)}/>
+      <AppButton containerStyle={{alignItems:'center', justifyContent: 'center', marginVertical: 15}} title="Signup" onPress={onSubmit}/>
       <Text style={styles.bottomText}>Already have an account? <Text style={styles.agreeTextBold} onPress={() => navigation.navigate('Signin')}>Log in</Text></Text>
       </KeyboardAwareScrollView>
       </ImageBackground>
